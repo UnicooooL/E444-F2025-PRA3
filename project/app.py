@@ -14,6 +14,13 @@ app.config.update(
     SECRET_KEY="change_me",
 )
 
+url = os.getenv('DATABASE_URL', f'sqlite:///{Path(basedir).joinpath(DATABASE)}')
+
+if url.startswith("postgres://"):
+    url = url.replace("postgres://", "postgresql://", 1)
+
+SQLALCHEMY_DATABASE_URI = url
+
 
 # connect to database
 def connect_db():
