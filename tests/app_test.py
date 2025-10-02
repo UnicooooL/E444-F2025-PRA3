@@ -1,6 +1,7 @@
 import os
 import pytest
 from pathlib import Path
+import json
 
 from project.app import app, init_db
 
@@ -60,6 +61,11 @@ def test_login_logout(client):
     rv = login(client, app.config["USERNAME"], app.config["PASSWORD"] + "x")
     assert b"Invalid password" in rv.data
 
+def test_delete_message(client):
+    """Ensure the messages are being deleted"""
+    rv = client.get('/delete/1')
+    data = json.loads(rv.data)
+    assert data["status"] == 1
 
 def test_messages(client):
     """Ensure that user can post messages"""
