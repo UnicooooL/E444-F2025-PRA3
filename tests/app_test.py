@@ -69,6 +69,11 @@ def test_delete_message(client):
     data = json.loads(rv.data)
     assert data["status"] == 1
 
+def test_search_page_exists(client):
+    """GET /search/ without query should load successfully."""
+    rv = client.get("/search/")
+    assert rv.status_code == 200
+
 def test_messages(client):
     """Ensure that user can post messages"""
     login(client, app.config["USERNAME"], app.config["PASSWORD"])
