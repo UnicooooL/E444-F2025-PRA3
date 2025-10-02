@@ -65,7 +65,11 @@ def test_login_logout(client):
 
 def test_delete_message(client):
     """Ensure the messages are being deleted"""
-    rv = client.get('/delete/1')
+    rv = client.get("/delete/1")
+    data = json.loads(rv.data)
+    assert data["status"] == 0
+    login(client, app.config["USERNAME"], app.config["PASSWORD"])
+    rv = client.get("/delete/1")
     data = json.loads(rv.data)
     assert data["status"] == 1
 
@@ -73,6 +77,25 @@ def test_search_page_exists(client):
     """GET /search/ without query should load successfully."""
     rv = client.get("/search/")
     assert rv.status_code == 200
+
+def test_delete_requires_login(client):
+    rv = client.get("/delete/1", follow_redirects=True) 
+
+    json_data = None
+    try:
+        json_data = rv.get_json()
+    except Exception:
+        pass
+
+    assert rv.status_code in (200, 302, 401, 403)
+    if json_data is not None:
+        assert json_data.get("status") == 0
+        assert "Please log in" in json_data.get("message", "")
+    else:
+        assert b"Please log in" in rv.data
+
+
+
 
 def test_messages(client):
     """Ensure that user can post messages"""
