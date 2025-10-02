@@ -45,6 +45,25 @@ def init_db():
         db.commit()
 
 
+# auto check table exists
+@app.before_first_request
+def ensure_schema():
+    with app.app_context():
+        db = connect_db()
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS entries (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                text  TEXT NOT NULL
+            )
+        """)
+        db.commit()
+        db.close()
+
+
+
+
+
 # open database connection
 def get_db():
     if not hasattr(g, "sqlite_db"):
