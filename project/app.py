@@ -117,9 +117,7 @@ def delete_entry(post_id):
         result = {'status': 0, 'message': repr(e)}
     return jsonify(result)
 
-@app.get("/")
-def index():
-    return "ok", 200
+
 
 
 if __name__ == "__main__":
