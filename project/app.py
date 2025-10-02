@@ -1,6 +1,9 @@
 import sqlite3
-
+import os
+from pathlib import Path
 from flask import Flask, g, render_template, request, session, flash, redirect, url_for, abort, jsonify
+
+basedir = Path(__file__).resolve().parent
 
 
 # create and initialize a new Flask app
@@ -14,12 +17,15 @@ app.config.update(
     SECRET_KEY="change_me",
 )
 
-url = os.getenv('DATABASE_URL', f'sqlite:///{Path(basedir).joinpath(DATABASE)}')
 
+default_sqlite = f"sqlite:///{(basedir / app.config['DATABASE']).as_posix()}"
+url = os.getenv("DATABASE_URL", default_sqlite)
 if url.startswith("postgres://"):
     url = url.replace("postgres://", "postgresql://", 1)
 
-SQLALCHEMY_DATABASE_URI = url
+app.config["SQLALCHEMY_DATABASE_URI"] = url
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
 
 
 # connect to database
@@ -110,6 +116,11 @@ def delete_entry(post_id):
     except Exception as e:
         result = {'status': 0, 'message': repr(e)}
     return jsonify(result)
+
+@app.get("/")
+def index():
+    return "ok", 200
+
 
 if __name__ == "__main__":
     app.run()
