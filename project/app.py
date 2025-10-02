@@ -25,6 +25,18 @@ SQLALCHEMY_DATABASE_URI = url
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+SQLALCHEMY_ENGINE_OPTIONS = {
+    "pool_pre_ping": True,
+    "pool_size": 1,
+    "max_overflow": 0,
+    "pool_recycle": 300,
+    "pool_timeout": 10,
+}
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db.session.remove()
+
+
 
 # create and initialize a new Flask app
 app = Flask(__name__)
